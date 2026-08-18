@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Financeiro — Organizar é economizar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0D14; --surface:#12151F; --surface-2:#181C29; --surface-3:#1E2333;
+  --border:#252B3D; --border-soft:#1B1F2C;
+  --text:#EAEDF5; --text-dim:#9AA1B5; --text-faint:#5C6379;
+  --accent:#7C5CFC; --accent-2:#A78BFA; --accent-glow:rgba(124,92,252,.35);
+  --mint:#00D9B5; --mint-dim:rgba(0,217,181,.15);
+  --danger:#FF5470; --danger-dim:rgba(255,84,112,.12);
+  --warn:#FFB020;
+  --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--text); font-family:var(--font-body); -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+.wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
+a{color:inherit;}
+
+/* ---------- background texture ---------- */
+.bg-glow{position:fixed; top:-200px; left:50%; transform:translateX(-50%); width:900px; height:900px; background:radial-gradient(circle, var(--accent-glow) 0%, transparent 65%); pointer-events:none; z-index:0;}
+
+/* ---------- nav ---------- */
+nav{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:22px 0;}
+.logo{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:15px;}
+.logo-mark{width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:15px; box-shadow:0 4px 16px var(--accent-glow);}
+.nav-cta{background:var(--surface-2); border:1px solid var(--border); padding:9px 18px; border-radius:10px; font-size:13.5px; font-weight:600; text-decoration:none; transition:border-color .2s;}
+.nav-cta:hover{border-color:var(--accent);}
+
+/* ---------- hero ---------- */
+.hero{position:relative; z-index:1; padding:64px 0 40px; display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center;}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; background:var(--mint-dim); color:var(--mint); font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:.03em; padding:6px 12px; border-radius:100px; margin-bottom:22px;}
+.eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--mint); box-shadow:0 0 8px var(--mint);}
+h1{font-family:var(--font-display); font-size:44px; line-height:1.12; font-weight:700; letter-spacing:-.01em; margin-bottom:20px;}
+h1 em{font-style:normal; background:linear-gradient(135deg,var(--accent-2),var(--mint)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p.sub{font-size:16.5px; color:var(--text-dim); line-height:1.65; max-width:480px; margin-bottom:32px;}
+.hero-actions{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.btn-primary{display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--accent),#6A4CE0); color:#fff; text-decoration:none; padding:15px 26px; border-radius:12px; font-weight:700; font-size:15px; box-shadow:0 8px 24px var(--accent-glow); transition:transform .15s ease;}
+.btn-primary:hover{transform:translateY(-2px);}
+.price-note{font-size:13px; color:var(--text-faint);}
+.price-note b{color:var(--text);}
+
+/* ---------- mockup ---------- */
+.mockup{position:relative;}
+.browser{background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.5);}
+.browser-bar{display:flex; align-items:center; gap:6px; padding:12px 14px; border-bottom:1px solid var(--border-soft); background:var(--surface-2);}
+.browser-bar span{width:9px; height:9px; border-radius:50%; background:var(--border);}
+.browser-bar .url{margin-left:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-faint); background:var(--surface-3); padding:4px 10px; border-radius:6px;}
+.browser-body{padding:20px;}
+.mock-hero{background:linear-gradient(135deg,rgba(124,92,252,.18),rgba(124,92,252,.03)); border:1px solid var(--border-soft); border-radius:12px; padding:16px; margin-bottom:12px;}
+.mock-hero .label{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;}
+.mock-hero .value{font-family:var(--font-display); font-size:26px; font-weight:700;}
+.mock-hero .delta{display:inline-block; margin-top:8px; font-size:11px; color:var(--mint); background:var(--mint-dim); padding:2px 9px; border-radius:100px; font-weight:600;}
+.mock-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+.mock-card{background:var(--surface-2); border:1px solid var(--border-soft); border-radius:10px; padding:12px;}
+.mock-card .l{font-size:10px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.03em; margin-bottom:5px;}
+.mock-card .v{font-family:var(--font-display); font-size:15px; font-weight:700;}
+.mock-bars{background:var(--surface-2); border:1px solid var(--border-soft); border-radius:10px; padding:14px; display:flex; align-items:flex-end; gap:8px; height:90px;}
+.mock-bars .bar{flex:1; background:linear-gradient(180deg,var(--accent-2),var(--accent)); border-radius:4px 4px 0 0; opacity:.9;}
+.float-badge{position:absolute; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-size:12.5px; font-weight:600; box-shadow:0 12px 30px rgba(0,0,0,.4); display:flex; align-items:center; gap:8px;}
+.float-badge.top{top:-16px; right:-10px; color:var(--mint);}
+.float-badge.top::before{content:'✓'; width:18px; height:18px; border-radius:50%; background:var(--mint-dim); display:flex; align-items:center; justify-content:center; font-size:11px;}
+.float-badge.bottom{bottom:-14px; left:-14px; color:var(--accent-2);}
+
+/* ---------- thesis strip ---------- */
+.thesis{position:relative; z-index:1; border-top:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft); padding:36px 0; margin-top:40px;}
+.thesis p{font-family:var(--font-display); font-size:20px; text-align:center; color:var(--text-dim); max-width:760px; margin:0 auto; line-height:1.5;}
+.thesis strong{color:var(--text); font-weight:700;}
+
+/* ---------- features ---------- */
+.section{position:relative; z-index:1; padding:88px 0;}
+.section-head{max-width:560px; margin-bottom:56px;}
+.section-head .kicker{font-family:var(--font-mono); font-size:12px; color:var(--accent-2); letter-spacing:.04em; text-transform:uppercase; margin-bottom:12px;}
+.section-head h2{font-family:var(--font-display); font-size:32px; font-weight:700; letter-spacing:-.01em; line-height:1.2;}
+.feature-row{display:grid; grid-template-columns:.9fr 1.1fr; gap:48px; align-items:center; padding:44px 0; border-top:1px solid var(--border-soft);}
+.feature-row:nth-child(even) .feature-visual{order:2;}
+.feature-num{font-family:var(--font-mono); font-size:12px; color:var(--text-faint);}
+.feature-row h3{font-family:var(--font-display); font-size:23px; font-weight:600; margin:10px 0 12px;}
+.feature-row p{color:var(--text-dim); font-size:14.5px; line-height:1.7;}
+.feature-visual{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; min-height:180px; display:flex; flex-direction:column; justify-content:center; gap:10px;}
+.import-line{display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border-soft); border-radius:9px; padding:9px 12px; font-size:12.5px;}
+.import-line .chk{width:16px; height:16px; border-radius:4px; background:var(--mint); display:flex; align-items:center; justify-content:center; font-size:10px; color:#0A0D14; flex-shrink:0;}
+.import-line .chk.off{background:var(--surface-3); border:1px solid var(--border);}
+.import-line .m{flex:1; color:var(--text-dim);}
+.import-line .cat{font-size:10.5px; background:var(--surface-3); padding:2px 8px; border-radius:100px; color:var(--text-dim);}
+.cat-pills{display:flex; flex-wrap:wrap; gap:8px;}
+.cat-pill{font-size:12px; padding:7px 12px; border-radius:100px; background:var(--surface-2); border:1px solid var(--border-soft); display:flex; align-items:center; gap:6px;}
+.device-row{display:flex; align-items:center; justify-content:center; gap:18px;}
+.device{background:var(--surface-2); border:1px solid var(--border-soft); border-radius:10px; padding:14px; text-align:center; font-size:11px; color:var(--text-dim);}
+.device .icon{font-size:22px; margin-bottom:6px; display:block;}
+.sync-line{width:32px; height:2px; background:repeating-linear-gradient(90deg,var(--accent-2) 0 4px, transparent 4px 8px);}
+
+/* ---------- vs spreadsheet ---------- */
+.vs{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:36px; display:grid; grid-template-columns:1fr 1fr; gap:0; overflow:hidden;}
+.vs > div{padding:8px 28px;}
+.vs .no{border-right:1px solid var(--border-soft);}
+.vs .tag{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:16px; display:inline-block; padding:4px 10px; border-radius:100px;}
+.vs .no .tag{color:var(--text-faint); background:var(--surface-2);}
+.vs .yes .tag{color:var(--mint); background:var(--mint-dim);}
+.vs ul{list-style:none;}
+.vs li{font-size:14px; color:var(--text-dim); padding:9px 0; display:flex; gap:10px; align-items:flex-start;}
+.vs .no li::before{content:'—'; color:var(--text-faint);}
+.vs .yes li::before{content:'✓'; color:var(--mint); font-weight:700;}
+.vs li{color:var(--text);}
+
+/* ---------- pricing ---------- */
+.pricing{text-align:center; padding:100px 0;}
+.price-card{max-width:420px; margin:0 auto; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid var(--border); border-radius:20px; padding:44px 36px; position:relative;}
+.price-card::before{content:''; position:absolute; inset:-1px; border-radius:20px; padding:1px; background:linear-gradient(135deg,var(--accent),transparent 40%); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;}
+.price-amount{font-family:var(--font-display); font-size:52px; font-weight:700; margin:18px 0 4px;}
+.price-amount span{font-size:16px; color:var(--text-dim); font-weight:500;}
+.price-card .cycle{color:var(--text-dim); font-size:13.5px; margin-bottom:28px;}
+.price-list{text-align:left; margin-bottom:30px;}
+.price-list li{list-style:none; display:flex; gap:10px; font-size:14px; color:var(--text-dim); padding:7px 0;}
+.price-list li::before{content:'✓'; color:var(--mint); font-weight:700;}
+.price-list li{color:var(--text);}
+.btn-full{display:flex; align-items:center; justify-content:center; width:100%; text-decoration:none;}
+.cancel-note{margin-top:16px; font-size:12px; color:var(--text-faint);}
+
+/* ---------- footer ---------- */
+footer{position:relative; z-index:1; border-top:1px solid var(--border-soft); padding:32px 0; text-align:center; color:var(--text-faint); font-size:12.5px;}
+
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr; padding-top:36px;}
+  h1{font-size:32px;}
+  .feature-row{grid-template-columns:1fr; padding:32px 0;}
+  .feature-row:nth-child(even) .feature-visual{order:0;}
+  .vs{grid-template-columns:1fr; gap:24px;}
+  .vs .no{border-right:none; border-bottom:1px solid var(--border-soft); padding-bottom:24px;}
+  .section{padding:56px 0;}
+  .thesis p{font-size:17px;}
+  .float-badge{display:none;}
+}
+@media(max-width:480px){
+  .wrap{padding:0 18px;}
+  nav{padding:16px 0;}
+  .logo{font-size:13px;}
+  .logo-mark{width:28px; height:28px; font-size:13px;}
+  .nav-cta{padding:8px 14px; font-size:12.5px;}
+  h1{font-size:26px; line-height:1.2;}
+  .hero p.sub{font-size:14.5px;}
+  .btn-primary{padding:13px 20px; font-size:14px; width:100%; justify-content:center;}
+  .hero-actions{flex-direction:column; align-items:flex-start; width:100%; gap:12px;}
+  .price-note{font-size:12px;}
+  .browser-body{padding:14px;}
+  .mock-hero .value{font-size:21px;}
+  .mock-bars{height:70px;}
+  .section-head h2{font-size:24px;}
+  .feature-row h3{font-size:19px;}
+  .vs{padding:24px 18px;}
+  .vs > div{padding:8px 0;}
+  .price-card{padding:32px 22px;}
+  .price-amount{font-size:38px;}
+  .thesis p{font-size:15px;}
+  .thesis{padding:28px 0;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="wrap">
+  <nav>
+    <div class="logo"><div class="logo-mark">$</div>Dashboard Financeiro</div>
+    <a class="nav-cta" href="https://pay.kiwify.com.br/aBfm7pk">Assinar</a>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Acesse do celular e do computador</div>
+      <h1>Você não precisa gastar menos.<br>Precisa <em>ver</em> pra onde o dinheiro vai.</h1>
+      <p class="sub">Importe sua fatura, revise cada lançamento e enxergue sua vida financeira organizada por categoria — sem planilha manual, sem esforço de atualizar toda semana.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="https://pay.kiwify.com.br/aBfm7pk">Assinar por R$19,90/mês →</a>
+        <span class="price-note">Cancele quando quiser · <b>Sem fidelidade</b></span>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="browser">
+        <div class="browser-bar"><span></span><span></span><span></span><span class="url">meudashboardfinanceiro.com.br</span></div>
+        <div class="browser-body">
+          <div class="mock-hero">
+            <div class="label">Total gasto no período</div>
+            <div class="value">R$ 3.248,90</div>
+            <div class="delta">▼ 12,4% vs. mês anterior</div>
+          </div>
+          <div class="mock-grid">
+            <div class="mock-card"><div class="l">Categoria top</div><div class="v">🍔 Alimentação</div></div>
+            <div class="mock-card"><div class="l">Assinaturas/mês</div><div class="v">R$ 89,80</div></div>
+          </div>
+          <div class="mock-bars">
+            <div class="bar" style="height:35%"></div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar" style="height:42%"></div>
+            <div class="bar" style="height:78%"></div>
+            <div class="bar" style="height:50%"></div>
+            <div class="bar" style="height:65%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="float-badge top">Fatura importada</div>
+      <div class="float-badge bottom">14 categorias</div>
+    </div>
+  </section>
+</div>
+
+<div class="thesis">
+  <div class="wrap">
+    <p>“Se organizar é uma forma de economizar.” <strong>A maior fonte de vazamento financeiro não é gastar mais — é não enxergar pra onde o dinheiro já está indo.</strong></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <div class="kicker">Como funciona</div>
+      <h2>Três coisas que fazem esse dashboard ser diferente de uma planilha</h2>
+    </div>
+
+    <div class="feature-row">
+      <div>
+        <div class="feature-num">01</div>
+        <h3>Importação automática</h3>
+        <p>Suba o PDF da fatura ou um CSV do banco. O sistema identifica cada lançamento e já sugere a categoria certa — nada de digitar linha por linha.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="import-line"><div class="chk">✓</div><div class="m">iFood</div><div class="cat">🍔 Alimentação</div></div>
+        <div class="import-line"><div class="chk">✓</div><div class="m">Uber</div><div class="cat">🚗 Transporte</div></div>
+        <div class="import-line"><div class="chk off"></div><div class="m">Estorno cartão</div><div class="cat">Ignorado</div></div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div>
+        <div class="feature-num">02</div>
+        <h3>Você aprova cada lançamento</h3>
+        <p>Antes de qualquer coisa entrar no sistema, você revisa item a item — aceita, edita a categoria ou recusa. Nada acontece sem sua autorização.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="cat-pills">
+          <div class="cat-pill">🍔 Alimentação · R$ 892</div>
+          <div class="cat-pill">🚗 Transporte · R$ 340</div>
+          <div class="cat-pill">🎮 Lazer · R$ 210</div>
+          <div class="cat-pill">💳 Assinaturas · R$ 89</div>
+          <div class="cat-pill">✈️ Viagens · R$ 0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div>
+        <div class="feature-num">03</div>
+        <h3>Celular, computador — os mesmos dados</h3>
+        <p>Faça login de onde estiver. Seus lançamentos ficam salvos na nuvem, sincronizados automaticamente entre todos os seus aparelhos.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="device-row">
+          <div class="device"><span class="icon">📱</span>Celular</div>
+          <div class="sync-line"></div>
+          <div class="device"><span class="icon">☁️</span>Nuvem</div>
+          <div class="sync-line"></div>
+          <div class="device"><span class="icon">💻</span>Computador</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="kicker">Comparação</div>
+      <h2>Planilha pronta vs. Dashboard Financeiro</h2>
+    </div>
+    <div class="vs">
+      <div class="no">
+        <span class="tag">Planilha que você compra</span>
+        <ul>
+          <li>Você digita cada gasto na mão</li>
+          <li>Esquece de atualizar e perde o controle</li>
+          <li>Fica presa a um aparelho só</li>
+          <li>Compra uma vez, mas o trabalho é seu pra sempre</li>
+        </ul>
+      </div>
+      <div class="yes">
+        <span class="tag">Dashboard Financeiro</span>
+        <ul>
+          <li>Importa a fatura automaticamente</li>
+          <li>Você só revisa e aprova</li>
+          <li>Acessa do celular ou computador</li>
+          <li>O sistema trabalha, você só decide</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <div class="section-head" style="margin:0 auto 40px; text-align:center;">
+      <div class="kicker">Investimento</div>
+      <h2>Menos que um lanche por mês</h2>
+    </div>
+    <div class="price-card">
+      <div class="cycle">Dashboard Financeiro</div>
+      <div class="price-amount">R$19<span>,90/mês</span></div>
+      <div class="cycle">Cobrança recorrente · cancele quando quiser</div>
+      <ul class="price-list">
+        <li>Importação automática de PDF e CSV</li>
+        <li>Categorias ilimitadas e personalizáveis</li>
+        <li>Acesso em qualquer aparelho, dados sincronizados</li>
+        <li>Controle de assinaturas e parcelas futuras</li>
+        <li>Atualizações incluídas</li>
+      </ul>
+      <a class="btn-primary btn-full" href="https://pay.kiwify.com.br/aBfm7pk">Assinar agora →</a>
+      <div class="cancel-note">Pagamento processado com segurança pela Kiwify</div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  Dashboard Financeiro — organizar é economizar.
+</footer>
+
+</body>
+</html>
