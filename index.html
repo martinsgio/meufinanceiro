@@ -340,7 +340,8 @@ tbody tr:hover{background:var(--surface-2);}
 .dropzone p{font-size:13px; color:var(--text-dim);}
 .dropzone .sub{font-size:11.5px; color:var(--text-faint); margin-top:4px;}
 
-.preview-table{max-height:320px; overflow-y:auto; border:1px solid var(--border-soft); border-radius:10px; margin-top:14px;}
+.preview-table{max-height:320px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-soft); border-radius:10px; margin-top:14px;}
+.preview-table table{min-width:640px;}
 
 .tabs{display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:11px; margin-bottom:18px; width:fit-content;}
 .tab-btn{padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-dim); background:none; border:none;}
@@ -359,6 +360,23 @@ tbody tr:hover{background:var(--surface-2);}
   .menu-btn{display:flex;}
   .hero-total{grid-column:span 1;}
 }
+@media(max-width:480px){
+  .main{padding:12px;}
+  .hero-total .kpi-value{font-size:28px;}
+  .topbar-title h1{font-size:20px;}
+  .form-row{grid-template-columns:1fr;}
+  .chart-card .chart-wrap{height:220px;}
+  .modal{max-width:100%;}
+  .modal-body, .modal-head, .modal-foot{padding-left:16px; padding-right:16px;}
+  .kpi{padding:14px;}
+  .card{padding:16px;}
+  .topbar-actions{width:100%;}
+  .topbar-actions .btn, .topbar-actions select{flex:1;}
+}
+.sidebar-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(5,6,12,.55); z-index:39;
+}
+.sidebar-backdrop.open{display:block;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -385,9 +403,23 @@ tbody tr:hover{background:var(--surface-2);}
   </div>
 </div>
 
+<!-- TELA DE ASSINATURA (paywall) -->
+<div id="paywallScreen" class="hidden" style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:20px;">
+  <div style="width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; text-align:center;">
+    <div style="font-size:32px; margin-bottom:10px;">🔒</div>
+    <div style="font-family:var(--font-display); font-weight:700; font-size:18px; margin-bottom:8px;">Assinatura necessária</div>
+    <p style="font-size:13px; color:var(--text-dim); margin-bottom:6px;">Assine para liberar seu dashboard.</p>
+    <p style="font-size:12px; color:var(--text-faint); margin-bottom:20px;">Conta: <span id="paywallEmail"></span> — use este mesmo e-mail no pagamento.</p>
+    <a href="https://pay.kiwify.com.br/aBfm7pk" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center; margin-bottom:10px; text-decoration:none;">Assinar por R$19,90/mês</a>
+    <button class="btn" id="btnRecheckSubscription" style="width:100%; justify-content:center; margin-bottom:10px;">Já paguei, verificar de novo</button>
+    <button class="btn btn-sm" id="btnLogoutPaywall" style="width:100%; justify-content:center; background:none; border:none; color:var(--text-dim);">Sair</button>
+  </div>
+</div>
+
 <div id="app" class="hidden">
 
   <!-- SIDEBAR -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark" id="brandMark">?</div>
@@ -836,8 +868,35 @@ $('#btnAuthSubmit').addEventListener('click', async ()=>{
 async function onLoginSuccess(user){
   currentUser = user;
   $('#authScreen').classList.add('hidden');
+
+  const allowed = await checkSubscriptionAccess();
+  if(!allowed){
+    $('#paywallScreen').classList.remove('hidden');
+    $('#paywallEmail').textContent = user.email;
+    return;
+  }
+
   $('#app').classList.remove('hidden');
   await startApp();
+}
+
+/* Verifica o status de assinatura em user_settings.
+   Bloqueia apenas quem já foi marcado como cancelado/atrasado pelo webhook
+   da Kiwify — todo mundo começa liberado (trial), e a Kiwify move pra
+   "active" quando paga, ou "canceled"/"past_due" se cancelar/atrasar. */
+async function checkSubscriptionAccess(){
+  try{
+    const { data, error } = await sb.from('user_settings').select('subscription_status').eq('user_id', currentUser.id).maybeSingle();
+    if(error) throw error;
+    const status = data?.subscription_status || 'trial';
+    // Só libera quem está com pagamento confirmado pela Kiwify. Quem acabou
+    // de criar conta ('trial') ainda não pagou nada e cai direto na tela
+    // de assinatura — é assim que forçamos a pessoa a passar pelo checkout.
+    return status === 'active';
+  }catch(e){
+    console.error('Falha ao verificar assinatura, bloqueando por segurança', e);
+    return false; // em caso de erro, não libera acesso indevido
+  }
 }
 
 function logout(){
@@ -1075,7 +1134,20 @@ function goToPage(page){
   renderPage(page);
 }
 $$('.nav-item').forEach(item=> item.addEventListener('click', ()=> goToPage(item.dataset.page)));
-$('#menuBtn').addEventListener('click', ()=> $('#sidebar').classList.toggle('open'));
+$('#menuBtn').addEventListener('click', ()=>{
+  $('#sidebar').classList.toggle('open');
+  $('#sidebarBackdrop').classList.toggle('open');
+});
+$('#sidebarBackdrop').addEventListener('click', ()=>{
+  $('#sidebar').classList.remove('open');
+  $('#sidebarBackdrop').classList.remove('open');
+});
+$$('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    $('#sidebar').classList.remove('open');
+    $('#sidebarBackdrop').classList.remove('open');
+  });
+});
 
 /* ---------------------------- Tema ---------------------------- */
 function applyTheme(){
@@ -2200,6 +2272,20 @@ function pickDefaultPeriod(){
 
 $('#btnLogout').addEventListener('click', ()=>{
   if(confirm('Sair da sua conta?')) logout();
+});
+$('#btnLogoutPaywall').addEventListener('click', logout);
+$('#btnRecheckSubscription').addEventListener('click', async ()=>{
+  const btn = $('#btnRecheckSubscription');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  const allowed = await checkSubscriptionAccess();
+  if(allowed){
+    $('#paywallScreen').classList.add('hidden');
+    $('#app').classList.remove('hidden');
+    await startApp();
+  } else {
+    toast('Ainda não identificamos o pagamento. Aguarde alguns minutos e tente de novo.', 'error');
+    btn.disabled = false; btn.textContent = 'Já paguei, verificar de novo';
+  }
 });
 async function startApp(){
   await loadState();
