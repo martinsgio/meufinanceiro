@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compra aprovada — Dashboard Financeiro</title>
+<style>
+  body{margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:#0B0E14; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:20px;}
+  .card{width:100%; max-width:440px; background:#151922; border:1px solid #262B38; border-radius:20px; padding:36px 32px; text-align:center;}
+  .check{width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,#7C5CFC,#4FD1C5); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:32px;}
+  h1{color:#F5F6FA; font-size:20px; margin:0 0 10px;}
+  p{color:#9AA3B5; font-size:14px; line-height:1.6; margin:0 0 24px;}
+  .steps{text-align:left; background:#0F1319; border:1px solid #262B38; border-radius:14px; padding:18px 20px; margin-bottom:24px;}
+  .steps li{color:#C7CCDA; font-size:13.5px; line-height:1.8;}
+  .btn{display:inline-block; width:100%; box-sizing:border-box; background:linear-gradient(135deg,#7C5CFC,#6A4CE0); color:#fff; text-decoration:none; padding:14px; border-radius:12px; font-weight:700; font-size:15px;}
+  .note{color:#6B7280; font-size:12px; margin-top:18px;}
+  .email-box{margin-top:28px; padding-top:24px; border-top:1px solid #262B38;}
+  .email-label{font-size:12.5px; color:#9AA3B5; margin-bottom:10px;}
+  #selfEmail{width:100%; box-sizing:border-box; background:#0F1319; border:1px solid #262B38; color:#F5F6FA; border-radius:10px; padding:11px 12px; font-size:14px; margin-bottom:10px;}
+  .btn-secondary{width:100%; box-sizing:border-box; background:transparent; border:1px solid #3A4152; color:#C7CCDA; padding:12px; border-radius:10px; font-weight:600; font-size:13.5px; cursor:pointer;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="check">✓</div>
+    <h1>Pagamento aprovado!</h1>
+    <p>Falta só um passo pra você acessar seu Dashboard Financeiro.</p>
+    <ol class="steps">
+      <li>Clique no botão abaixo</li>
+      <li>Crie sua conta usando <strong>o mesmo e-mail</strong> que você usou agora na compra</li>
+      <li>Pronto — seu acesso já vem liberado automaticamente</li>
+    </ol>
+    <a class="btn" href="https://meufinanceiro-nine.vercel.app" target="_blank">Acessar meu Dashboard →</a>
+    <p class="note">Use exatamente o mesmo e-mail da compra, senão o sistema não vai reconhecer seu pagamento.</p>
+
+    <div class="email-box">
+      <p class="email-label">Quer guardar esse link no seu e-mail pra não perder?</p>
+      <input type="email" id="selfEmail" placeholder="seu@email.com">
+      <button class="btn-secondary" id="sendSelfEmail">Enviar esse link pro meu e-mail</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('sendSelfEmail').addEventListener('click', function(){
+      var email = document.getElementById('selfEmail').value.trim();
+      if(!email || email.indexOf('@') === -1){
+        alert('Digite um e-mail válido.');
+        return;
+      }
+      var subject = encodeURIComponent('Seu acesso ao Dashboard Financeiro');
+      var body = encodeURIComponent(
+        'Guarde este link:\n\n' +
+        'https://meufinanceiro-nine.vercel.app\n\n' +
+        'Passo a passo:\n' +
+        '1. Abra o link acima\n' +
+        '2. Crie sua conta usando o mesmo e-mail que você usou na compra\n' +
+        '3. Pronto — o acesso é liberado automaticamente\n'
+      );
+      window.location.href = 'mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body;
+    });
+  </script>
+</body>
+</html>
